@@ -1,0 +1,262 @@
+# Jerarquías de fuentes para verificación de eventos VIDECI
+# Cada tipo de evento mapea a una lista ordenada de niveles de fuentes.
+# Los agentes buscan por nivel en orden, pasando al siguiente si no encuentran coincidencia.
+# Cada nivel tiene: nombre, patrones de búsqueda (plantillas), y notas.
+#
+# Los patrones incluyen búsquedas en español e inglés para maximizar cobertura.
+
+sequia:
+  etiqueta: "Sequía"
+  niveles:
+    - nombre: Decretos y declaratorias oficiales
+      patrones_busqueda:
+        - "Bolivia decreto supremo emergencia sequía {year} {department}"
+        - "Bolivia decreto departamental desastre sequía {year} {department}"
+        - "Bolivia declaratoria emergencia municipio {municipality} sequía {year}"
+        - "site:gacetaoficialdebolivia.gob.bo sequía {year}"
+      notas: >
+        Fuente más confiable para verificación municipal — nombran municipios explícitamente.
+        Buscar Decretos Supremos (DS) y Decretos Departamentales (DD).
+        Ejemplo: DS 29770 (oct 2008) lista municipios del Chaco en emergencia.
+        También buscar en gacetas oficiales departamentales (ej: tarija.gob.bo/gaceta-oficial).
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia drought {year} {department}"
+        - "site:reliefweb.int Bolivia sequia {year} {department}"
+        - "site:reliefweb.int Bolivia drought disaster {year}"
+      notas: >
+        Mejor para eventos mayores. Revisar páginas de desastre: reliefweb.int/disaster/dr-{year}-*-bol.
+        Buscar también Situation Reports (SitRep) del Equipo Humanitario de País.
+        Resultados en inglés y español. ADVERTENCIA: ReliefWeb bloquea WebFetch (403),
+        usar solo WebSearch para encontrar URLs y extraer info de snippets.
+    - nombre: INSA (Seguro Agrario)
+      patrones_busqueda:
+        - "INSA Bolivia indemnización sequía {year} {municipality} {department}"
+        - "INSA seguro agrario {municipality} pérdida cultivos sequía {year}"
+        - "site:insa.gob.bo {municipality} sequía"
+        - "site:insa.gob.bo wp-content/uploads MEMORIA-{year}"
+      notas: >
+        Instituto del Seguro Agrario — fuente valiosa para verificación municipal.
+        Nombra municipios indemnizados por pérdida de cultivos.
+        ADVERTENCIA: Las URLs de prensa (/95-prensa/) están rotas (404, sitio reestructurado).
+        Preferir PDFs de memorias anuales: insa.gob.bo/wp-content/uploads/2025/08/MEMORIA-{year}-INSA.pdf
+        Si no hay PDF, buscar en Google snippets o noticias que republiquen datos INSA.
+    - nombre: Informes de ONGs
+      patrones_busqueda:
+        - "Save the Children Bolivia sequia {year} {municipality} {department}"
+        - "WFP Bolivia drought {year} {department} families"
+        - "PMA Bolivia sequía {year} {department} familias"
+        - "IFRC DREF Bolivia drought {year}"
+        - "Oxfam Bolivia sequia {year} {department}"
+      notas: >
+        Datos granulares a nivel municipal. Buscar Save the Children, PMA/WFP, FICR/IFRC, Oxfam.
+        Reportes disponibles en ambos idiomas. WFP Country Briefs mensuales son útiles para
+        confirmar departamento+año. DREF operations tienen nivel municipal.
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia sequia {year} {municipality} {department} familias afectadas"
+        - "Bolivia sequía {year} {province} emergencia"
+        - "\"{municipality}\" sequía {year} familias"
+      notas: >
+        El Deber, Los Tiempos, Página Siete, Bolivia.com, Noticiasfides (ANF), ABI, eju.tv, Urgente.bo.
+        Mejor cobertura post-2015. ANF es buena para municipios específicos.
+        ABI (agencia estatal) cubre declaratorias oficiales.
+    - nombre: Informes especiales FAO/PMA
+      patrones_busqueda:
+        - "FAO WFP Bolivia {year} drought special report"
+        - "FAO WFP Bolivia {year} food security assessment"
+        - "FAO PMA Bolivia {year} sequía evaluación seguridad alimentaria"
+      notas: >
+        Excelentes cuando existen, pero escasos. Revisar fao.org/4/ para reportes archivados.
+        Disponibles en español e inglés. FAO Drought Portal tiene proyectos por país.
+    - nombre: Fundación Tierra
+      patrones_busqueda:
+        - "site:ftierra.org Bolivia sequia {year} {department}"
+        - "Fundación Tierra Bolivia sequía {year} precipitación"
+      notas: "Mejor fuente para datos de precipitación y análisis departamental. Solo en español."
+    - nombre: Literatura científica
+      patrones_busqueda:
+        - "Bolivia drought {year} precipitation ENSO altiplano"
+        - "Bolivia sequía {year} SENAMHI precipitación"
+      notas: >
+        Útil para verificar condiciones climáticas cuando no hay fuentes de prensa.
+        Journal of Climate, NHESS (Copernicus), SISSA. Confirman que la sequía
+        existió meteorológicamente, aunque no nombren municipios.
+    - nombre: EM-DAT (dataset local pre-cargado)
+      patrones_busqueda:
+        - "(no requiere búsqueda web — se carga en Fase 1 desde Research/emdat-bolivia-climatological.csv)"
+      notas: >
+        Dataset descargado de public.emdat.be con eventos climatológicos de Bolivia.
+        Se carga en Fase 1 y se inyecta en el prompt de cada agente como contexto.
+        Matching automático: año + departamento → corroboración instantánea sin WebSearch.
+        Granularidad: departamento (Admin-1) en la mayoría de registros, algunos con Admin-2.
+        Techo de clasificación: "corroborado" (departamento). Para subir a "verificado"
+        el agente debe buscar fuentes web que nombren el municipio.
+        Cobertura sequía 2002-2023: 7 eventos (2004, 2008, 2010, 2013, 2014, 2016, 2023).
+        Años sin cobertura EM-DAT: 2002, 2003, 2005, 2006, 2007, 2009, 2011, 2012, 2015,
+        2017, 2018, 2019, 2020, 2021, 2022 — para estos, depender de búsqueda web.
+        URL de referencia: https://public.emdat.be/ | Docs: https://doc.emdat.be/
+    - nombre: Internet Archive (documentos archivados)
+      patrones_busqueda:
+        - "ia search 'subject:\"Bolivia\" subject:\"drought\" date:[{year}-01-01 TO {year}-12-31] mediatype:texts' --parameters=\"rows=10\""
+        - "ia search -F '\"sequía\" \"{municipality}\" \"{year}\"' --parameters=\"rows=5\""
+        - "ia search '(title:\"Bolivia\" AND (title:\"sequía\" OR title:\"drought\")) date:{year}*' --parameters=\"rows=10\""
+      notas: >
+        Usar CLI `ia` (skill /ia). Buscar documentos gubernamentales, reportes de ONGs,
+        y publicaciones académicas archivadas en archive.org. Especialmente útil para
+        eventos pre-2010 cuyas fuentes web originales desaparecieron.
+        Los documentos en archive.org son permanentes — URLs estables.
+        Incluir identificador archive.org en notas: "details/{identifier}".
+    - nombre: DesInventar
+      patrones_busqueda:
+        - "DesInventar Bolivia sequia {year} {department} {municipality}"
+      notas: "Base de datos en desinventar.org pero difícil de buscar sin interfaz web. Último recurso."
+
+inundacion:
+  etiqueta: "Inundación"
+  niveles:
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia flood {year} {department}"
+        - "site:reliefweb.int Bolivia inundacion {year} {department}"
+      notas: "Revisar páginas de desastre e informes de situación OCHA."
+    - nombre: SENAMHI
+      patrones_busqueda:
+        - "SENAMHI Bolivia precipitacion {year} {department} alerta"
+        - "SENAMHI Bolivia {year} crecida rio {province}"
+      notas: "Boletines meteorológicos, datos de nivel de ríos. monitorsequias.senamhi.gob.bo"
+    - nombre: Informes de ONGs
+      patrones_busqueda:
+        - "IFRC Bolivia flood {year} {department}"
+        - "UNICEF Bolivia inundacion {year} {department} familias"
+      notas: "Operaciones DREF de FICR, respuestas de emergencia UNICEF."
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia inundacion {year} {municipality} {department} familias afectadas"
+        - "Bolivia riada desborde {year} {province}"
+      notas: "El Deber, Los Tiempos, Página Siete."
+
+granizada:
+  etiqueta: "Granizada"
+  niveles:
+    - nombre: SENAMHI
+      patrones_busqueda:
+        - "SENAMHI Bolivia granizada {year} {department} alerta"
+      notas: "Fuente primaria para eventos de granizo."
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia granizada {year} {municipality} {department} cultivos"
+        - "Bolivia granizo {year} {province} hectáreas"
+      notas: "Impacto agrícola frecuentemente cubierto localmente."
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia hail {year} {department}"
+      notas: "Solo cubre eventos mayores."
+
+helada:
+  etiqueta: "Helada"
+  niveles:
+    - nombre: SENAMHI
+      patrones_busqueda:
+        - "SENAMHI Bolivia helada {year} {department} alerta"
+        - "SENAMHI Bolivia temperatura minima {year} {department}"
+      notas: "Boletines de helada y registros de temperatura."
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia helada {year} {municipality} {department} cultivos ganado"
+        - "Bolivia helada {year} {province} familias afectadas"
+      notas: "Eventos de helada en el altiplano frecuentemente en noticias agrícolas."
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia frost {year} {department}"
+        - "site:reliefweb.int Bolivia helada {year}"
+      notas: "Solo cubre eventos mayores, frecuentemente combinados con sequía."
+
+deslizamiento:
+  etiqueta: "Deslizamiento"
+  niveles:
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia landslide {year} {department}"
+        - "site:reliefweb.int Bolivia deslizamiento {year}"
+      notas: "Revisar informes de situación OCHA."
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia deslizamiento {year} {municipality} {department}"
+        - "Bolivia mazamorra derrumbe {year} {province}"
+      notas: "Cierres de carreteras y víctimas generalmente cubiertos."
+    - nombre: SENAMHI
+      patrones_busqueda:
+        - "SENAMHI Bolivia precipitacion {year} {department} deslizamiento"
+      notas: "Datos de precipitación como evidencia proxy."
+
+incendio:
+  etiqueta: "Incendio forestal"
+  niveles:
+    - nombre: ReliefWeb
+      patrones_busqueda:
+        - "site:reliefweb.int Bolivia fire {year} {department}"
+        - "site:reliefweb.int Bolivia incendio forestal {year}"
+      notas: "Temporadas de incendios mayores (2019, 2024) bien documentadas."
+    - nombre: Informes de ONGs
+      patrones_busqueda:
+        - "UNICEF Bolivia incendio {year} {department}"
+        - "Bolivia fire emergency {year} Chiquitania"
+      notas: "UNICEF y Fundación Tierra cubren impactos de incendios."
+    - nombre: Noticias bolivianas
+      patrones_busqueda:
+        - "Bolivia incendio forestal {year} {municipality} {department} hectáreas"
+        - "Bolivia chaqueo quema {year} {province}"
+      notas: "Cobertura de temporada de incendios pico ago-oct."
+    - nombre: Satélite/FIRMS
+      patrones_busqueda:
+        - "FIRMS MODIS Bolivia fire {year} {department}"
+        - "NASA fire Bolivia {year} hotspots"
+      notas: "firms.modaps.eosdis.nasa.gov — detección satelital de incendios."
+
+# Eventos compuestos: mapear al tipo primario
+mapeo_compuestos:
+  "SEQUIA Y HELADA": sequia
+  "SEQUIA-HELADA": sequia
+  "SEQUIA E INCENDIO": sequia
+  "SEQUIA-INCENDIOS": sequia
+  "SEQUIA-INCENDIO": sequia
+  "HELADA - SEQUIA": helada
+  "HELADA - SEQUIA - INCENDIO": helada
+  "SEQUIA-HELADA -GRANIZADA": sequia
+  "SEQUI-INCENDIOS": sequia
+  "SEQUIA-HELADA-DESLIZAMIENTO": sequia
+  "Escasez de Agua": sequia
+  "Falta de Agua": sequia
+
+# Wayback Machine — rescate de enlaces rotos
+wayback_machine:
+  availability_api: "https://archive.org/wayback/available?url={url}"
+  cdx_api: "https://web.archive.org/cdx/search/cdx?url={url}&output=json&limit=5&fl=timestamp,statuscode"
+  url_template: "https://web.archive.org/web/{timestamp}/{url}"
+  notas: >
+    Usar SOLO cuando una URL encontrada devuelve 404/403/timeout.
+    La API de disponibilidad es rápida (un GET). El CDX da más control
+    (filtrar por statuscode=200, elegir timestamp más cercano al año del evento).
+    Sitios donde Wayback es especialmente útil:
+    - insa.gob.bo/95-prensa/* (todas 404 desde reestructuración ~2024)
+    - bolivia.com/noticias/DetalleNoticia* (noticias antiguas intermitentes)
+    - abi.bo URLs antiguas
+    - PDFs gubernamentales que cambian de servidor
+  advertencias:
+    - No todas las páginas están archivadas — cobertura variable
+    - Contenido dinámico (bases de datos, buscadores) no se archiva bien
+    - Respetar rate limits de archive.org (no más de 1 req/seg)
+  cobertura_probada:
+    buena:
+      - "PDFs gubernamentales (ej: MEMORIA-2017-INSA.pdf → snapshot 2025-12-06)"
+      - "abi.bo homepage (archivada, probar artículos individuales)"
+      - "reliefweb.int (bien archivado en general)"
+      - "fao.org (bien archivado)"
+    mala:
+      - "insa.gob.bo/95-prensa/* — nunca archivadas (ni sección ni artículos individuales)"
+      - "bolivia.com/noticias/DetalleNoticia*.asp — noticias viejas no archivadas"
+    nota: >
+      Fuentes bolivianas pequeñas (INSA prensa, bolivia.com antiguas) tienen mala cobertura.
+      Fuentes internacionales (ReliefWeb, FAO, IFRC) y PDFs gubernamentales tienen buena cobertura.
+      Wayback es más útil para rescatar fuentes internacionales que bolivianas.

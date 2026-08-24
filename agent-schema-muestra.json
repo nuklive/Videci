@@ -1,0 +1,29 @@
+{
+  "$comment": "Schema for muestra (sample) mode agent responses. Respond ONLY with valid JSON matching this structure.",
+  "cluster": "{year}_{department}",
+  "eventos": [
+    {
+      "id": 170,
+      "año_evento": 2002,
+      "departamento": "Cochabamba",
+      "municipio": "Bolívar",
+      "familias": 2000,
+      "estado": "verificado|corroborado|corroborado_debil|no_verificado",
+      "fuentes": [
+        {
+          "url": "https://...",
+          "url_original": "(solo si archivada=true)",
+          "titulo": "...",
+          "año_fuente": 2002,
+          "coincide_año": true,
+          "coincide_tipo_evento": true,
+          "nivel_geo": "municipio|provincia|departamento|pais",
+          "nivel_fuente": "Decretos y declaratorias oficiales",
+          "archivada": false,
+          "notas": "..."
+        }
+      ],
+      "alertas": ["..."]
+    }
+  ]
+}

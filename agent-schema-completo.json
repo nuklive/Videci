@@ -1,0 +1,28 @@
+{
+  "$comment": "Schema for completo (full) mode agent responses. Respond ONLY with valid JSON matching this structure.",
+  "periodo": "{year_range}",
+  "crisis": [
+    {
+      "año": 2007,
+      "departamento": "La Paz",
+      "eventos_videci": 274,
+      "municipios_videci": 32,
+      "familias_total": 12450,
+      "estado": "corroborado|corroborado_debil|no_verificado",
+      "fuente": {
+        "url": "https://...",
+        "url_original": "(solo si archivada=true)",
+        "titulo": "...",
+        "año_fuente": 2007,
+        "coincide_año": true,
+        "coincide_tipo_evento": true,
+        "nivel_geo": "departamento|pais",
+        "nivel_fuente": "ReliefWeb",
+        "archivada": false,
+        "municipios_nombrados": ["Achacachi", "Batallas"],
+        "notas": "..."
+      },
+      "alertas": ["..."]
+    }
+  ]
+}
